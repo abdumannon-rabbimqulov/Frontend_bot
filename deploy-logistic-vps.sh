@@ -23,6 +23,7 @@ SCP_BASE=(scp -i "$SSH_KEY" -o StrictHostKeyChecking=no)
 echo "📤 Frontend → ${LOGISTIKA_SSH_HOST}:${REMOTE_WEB}"
 "${SSH_BASE[@]}" "$LOGISTIKA_SSH_HOST" "mkdir -p '$REMOTE_WEB'"
 "${SCP_BASE[@]}" index.html "$LOGISTIKA_SSH_HOST:$REMOTE_WEB/index.html"
+"${SCP_BASE[@]}" hero.png "$LOGISTIKA_SSH_HOST:$REMOTE_WEB/hero.png"
 "${SCP_BASE[@]}" -r admin "$LOGISTIKA_SSH_HOST:$REMOTE_WEB/"
 
 echo "⚙️ Nginx logistic.org.uz konfig..."

@@ -11,22 +11,126 @@
     <style>
         :root {
             --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.5);
             --bg-dark: #020617;
-            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-bg: rgba(15, 23, 42, 0.6);
             --border: rgba(255, 255, 255, 0.1);
             --text: #f8fafc;
             --text-dim: #94a3b8;
             --success: #4ade80;
             --error: #f87171;
+            --tg-blue: #0088cc;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg-dark); color: var(--text); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--bg-dark); 
+            color: var(--text); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
         .bg-glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%); z-index: -1; filter: blur(80px); animation: move 15s infinite alternate; }
         @keyframes move { from { transform: translate(-30%, -30%); } to { transform: translate(30%, 30%); } }
 
-        .container { width: 90%; max-width: 420px; background: var(--card-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 2rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .container { 
+            width: 90%; 
+            max-width: 420px; 
+            background: var(--card-bg); 
+            backdrop-filter: blur(25px); 
+            -webkit-backdrop-filter: blur(25px); 
+            border: 1px solid var(--border); 
+            border-radius: 2.5rem; 
+            padding: 2.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+            z-index: 10;
+            display: none; /* Hidden by default, shown if TG context found */
+        }
+
+        /* Landing Page Styles */
+        .landing-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .hero-image {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 2rem;
+            box-shadow: 0 0 40px var(--primary-glow);
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            transition: transform 0.5s ease;
+        }
+        .hero-image:hover {
+            transform: scale(1.02);
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: var(--text-dim);
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-tg {
+            background: var(--tg-blue);
+            color: white;
+            padding: 1.25rem 2.5rem;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-tg:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 136, 204, 0.6);
+        }
+
+        .tg-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
 
         #status-area { text-align: center; margin-bottom: 1.5rem; }
         .badge { padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); }
@@ -53,7 +157,27 @@
 </head>
 <body>
     <div class="bg-glow"></div>
-    <div class="container">
+
+    <!-- Landing Section -->
+    <div id="landing-area" class="landing-container">
+        <img src="hero.png" alt="Logistika AI Hero" class="hero-image">
+        <div class="hero-content">
+            <h1>Logistika Kelajagi <br><span>Sun'iy Intellekt Bilan</span></h1>
+            <p>Logistika operatsiyalaringizni aqlli robot yordamida boshqaring. Yuklarni kuzatish, marshrutlarni optimallashtirish va tezkor aloqa — barchasi bir joyda, @Logistika_AIbot bilan.</p>
+            
+            <div class="cta-group">
+                <a href="https://t.me/Logistika_AIbot" class="btn-tg">
+                    <svg class="tg-icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                    </svg>
+                    Botga Kirish
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- App/Profile Container -->
+    <div class="container" id="app-container">
         <div id="status-area">
             <span class="badge" id="status-msg">🔄 Yuklanmoqda...</span>
         </div>
@@ -117,6 +241,9 @@
         }
 
         function showProfile(user) {
+            document.getElementById('landing-area').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            
             document.getElementById('status-area').style.display = 'none';
             const area = document.getElementById('profile-area');
             area.style.display = 'block';
@@ -151,12 +278,20 @@
             tg.setHeaderColor('#020617');
 
             const savedData = localStorage.getItem('user_data');
-            if (savedData) {
-                showProfile(JSON.parse(savedData));
-            } else if (tg.initData) {
-                login(tg.initData);
+            
+            if (tg.initData) {
+                // If in TG context, hide landing and show loader
+                document.getElementById('landing-area').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+                
+                if (savedData) {
+                    showProfile(JSON.parse(savedData));
+                } else {
+                    login(tg.initData);
+                }
             } else {
-                updateStatus("Telegram muhiti topilmadi", true);
+                // Not in TG context, show landing page (default state)
+                console.log("Web mode: Showing landing page");
             }
         };
     </script>
