@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiFlow Admin — Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sb">
+    <div class="sb-logo">
+        <div class="sb-logomark">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M3 10L10 3L17 10V17H13V13H7V17H3V10Z" stroke="#000" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+            <div class="sb-logotxt">Logi<span>Flow</span></div>
+            <div class="sb-tagline">v2.5.0 · ADMIN</div>
+        </div>
+    </div>
+
+    <nav class="sb-nav">
+        <div class="sb-sec">Asosiy</div>
+        <div class="sb-item on" onclick="showSection('dash', this)">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+            Dashboard
+        </div>
+        
+        <div class="sb-sec">Boshqaruv</div>
+        <div class="sb-item" onclick="showSection('trucks', this)">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8h14M1 4h14M1 12h14"/></svg>
+            Mashina turlari
+        </div>
+        
+        <div class="sb-item" onclick="showSection('profile', this)">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5" r="3"/><path d="M2 14v-1a4 4 0 014-4h4a4 4 0 014 4v1"/></svg>
+            Profil
+        </div>
+    </nav>
+
+    <div class="sb-divider"></div>
+    <div class="sb-foot">
+        <div class="sb-user" onclick="showSection('profile')">
+            <div class="sb-ava" id="user-initials">AD</div>
+            <div>
+                <div class="sb-uname" id="user-full-name">Admin</div>
+                <div class="sb-urole" id="user-role">SUPERADMIN</div>
+            </div>
+            <div class="sb-status"></div>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <div class="topbar">
+        <div class="tb-title" id="page-title">Dashboard <small>Tizim holati</small></div>
+        <div class="tb-pill">● Live</div>
+        <div class="tb-btn" onclick="location.reload()" title="Yangilash">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 8a5 5 0 109-3M12 2v3H9"/></svg>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- DASHBOARD -->
+        <section class="sec on" id="sec-dash">
+            <div class="ai-banner">
+                <div class="ai-icon">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="#f59e0b" stroke-width="1.4"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M7 7V5a3 3 0 016 0v2"/></svg>
+                </div>
+                <div class="ai-body">
+                    <div class="ai-title">Tizim nazorati — <span id="server-status" style="color:var(--grn)">Online</span></div>
+                    <div class="ai-sub" id="last-update">Oxirgi yangilanish: hozirgina</div>
+                </div>
+                <div class="pulse-dot"></div>
+            </div>
+            
+            <div class="g4 mb16">
+                <div class="stat">
+                    <div class="stat-val" id="count-truck-types">0</div>
+                    <div class="stat-lbl">Mashina turlari</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-val" id="count-orders">0</div>
+                    <div class="stat-lbl">Aktiv buyurtmalar</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-val" style="color:var(--grn)">99.9%</div>
+                    <div class="stat-lbl">API Uptime</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-val" id="count-users">0</div>
+                    <div class="stat-lbl">Foydalanuvchilar</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRUCK TYPES CRUD -->
+        <section class="sec" id="sec-trucks">
+            <div class="card">
+                <div class="card-hd">
+                    <h3>Mashina turlari ro'yxati</h3>
+                    <button class="btn btn-acc btn-sm" onclick="openTruckModal()">+ Yangi qo'shish</button>
+                </div>
+                <div class="tbl-wrap">
+                    <table id="truck-table">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>Nomi</th>
+                                <th>Max Og'irlik</th>
+                                <th>Max Hajm</th>
+                                <th>Status</th>
+                                <th>Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="truck-list">
+                            <!-- JS orqali to'ldiriladi -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROFILE -->
+        <section class="sec" id="sec-profile">
+            <div class="g-main">
+                <div class="card card-pad">
+                    <h3>Profil ma'lumotlari</h3>
+                    <div class="divider"></div>
+                    <form id="profile-form">
+                        <div class="field">
+                            <label>To'liq ism</label>
+                            <input type="text" id="prof-name" placeholder="Ismingizni kiriting">
+                        </div>
+                        <div class="field">
+                            <label>Telefon raqam</label>
+                            <input type="text" id="prof-phone" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Email</label>
+                            <input type="email" id="prof-email" placeholder="Emailingiz">
+                        </div>
+                        <button type="submit" class="btn btn-acc">Saqlash</button>
+                    </form>
+                </div>
+                
+                <div class="card card-pad">
+                    <h3>Tizim holati</h3>
+                    <div class="divider"></div>
+                    <div class="tog-row">
+                        <div class="tog-info">
+                            <div class="tog-lbl">Bildirishnomalar</div>
+                            <div class="tog-sub">Telegram orqali ogohlantirish</div>
+                        </div>
+                        <div class="tog on"></div>
+                    </div>
+                    <button class="btn btn-red" onclick="logout()" style="margin-top: 20px; width: 100%;">Tizimdan chiqish</button>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- MODAL FOR TRUCK TYPE -->
+<div class="overlay" id="truck-modal">
+    <div class="modal">
+        <div class="modal-hd">
+            <h2 id="modal-title">Mashina turi</h2>
+            <button class="modal-close" onclick="closeTruckModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="truck-form">
+                <input type="hidden" id="truck-id">
+                <div class="field">
+                    <label>Nomi</label>
+                    <input type="text" id="truck-name" required placeholder="Masalan: Fura">
+                </div>
+                <div class="g2">
+                    <div class="field">
+                        <label>Max Og'irlik (kg)</label>
+                        <input type="number" id="truck-weight" required>
+                    </div>
+                    <div class="field">
+                        <label>Max Hajm (m³)</label>
+                        <input type="number" id="truck-volume" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Tavsif</label>
+                    <textarea id="truck-desc"></textarea>
+                </div>
+                <button type="submit" class="btn btn-acc" style="width: 100%;">Saqlash</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
