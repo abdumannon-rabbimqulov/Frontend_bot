@@ -1,0 +1,17 @@
+# Secrets
+.env
+
+# MacOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Deployment artifacts
+*.tar.gz
