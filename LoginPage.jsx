@@ -36,6 +36,10 @@ function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Login failed');
+      if (data.access_token) localStorage.setItem('access_token', data.access_token);
+      if (data.refresh_token) localStorage.setItem('refresh_token', data.refresh_token);
+      if (data.role) localStorage.setItem('role', data.role);
+      if (data.next_step) localStorage.setItem('next_step', data.next_step);
       setResponse(data);
     } catch (err) {
       setError(err.message);

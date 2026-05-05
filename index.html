@@ -214,11 +214,56 @@
     <script>
         const tg = window.Telegram.WebApp;
         const ADMIN_ID = 7915740408;
+        const NEXT_STEP_DONE = 'done';
+        const NEXT_STEP_FILL_DRIVER_PROFILE = 'fill_driver_profile';
 
         function updateStatus(msg, isError = false) {
             const el = document.getElementById('status-msg');
             el.textContent = msg;
             el.style.color = isError ? 'var(--error)' : 'inherit';
+        }
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem('access_token');
+            return {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            };
+        }
+
+        async function getMyProfile() {
+            const res = await fetch('/auth/me', { headers: getAuthHeaders() });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || 'Profilni olishda xatolik');
+            return data;
+        }
+
+        function showNextStepCard(authPayload) {
+            document.getElementById('landing-area').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            document.getElementById('status-area').style.display = 'none';
+
+            const area = document.getElementById('profile-area');
+            const role = authPayload.role || 'Noma\'lum';
+            area.style.display = 'block';
+            area.style.animation = 'fadeIn 0.5s ease';
+
+            document.getElementById('u-name').textContent = "Profil to'ldirish kerak";
+            document.getElementById('u-ava').textContent = role[0]?.toUpperCase() || '?';
+            document.getElementById('u-role').textContent = role;
+            document.getElementById('u-phone').textContent = '-';
+            document.getElementById('u-id').textContent = '#-';
+            document.getElementById('u-balance').textContent = '0 UZS';
+
+            const actions = document.getElementById('admin-action');
+            actions.innerHTML = '';
+            const profileBtn = document.createElement('button');
+            profileBtn.className = 'btn btn-primary';
+            profileBtn.innerHTML = '📝 Driver profilini to‘ldirish';
+            profileBtn.onclick = () => {
+                tg?.showAlert?.("Profil ma'lumotlarini to'ldirish oynasini frontendda oching yoki bot orqali davom eting.");
+            };
+            actions.appendChild(profileBtn);
         }
 
         async function login(initData) {
@@ -232,8 +277,16 @@
                 if (!res.ok) throw new Error(data.detail || 'Xatolik yuz berdi');
 
                 localStorage.setItem('access_token', data.access_token);
-                localStorage.setItem('user_data', JSON.stringify(data));
-                showProfile(data);
+                localStorage.setItem('auth_payload', JSON.stringify(data));
+
+                if (data.next_step === NEXT_STEP_FILL_DRIVER_PROFILE) {
+                    showNextStepCard(data);
+                    return;
+                }
+
+                const profile = await getMyProfile();
+                localStorage.setItem('user_data', JSON.stringify(profile));
+                showProfile(profile);
             } catch (e) {
                 updateStatus(e.message, true);
                 document.getElementById('retry-area').style.display = 'block';
@@ -256,7 +309,7 @@
             document.getElementById('u-id').textContent = "#" + user.user_id;
             document.getElementById('u-balance').textContent = (user.balance || 0) + " UZS";
 
-            if (user.user_id == ADMIN_ID) {
+            if (user.user_id == ADMIN_ID || user.role === 'admin') {
                 const adminBtn = document.createElement('button');
                 adminBtn.className = 'btn btn-primary';
                 adminBtn.innerHTML = '⚙️ Admin Panel';
@@ -278,13 +331,16 @@
             tg.setHeaderColor('#020617');
 
             const savedData = localStorage.getItem('user_data');
+            const savedAuth = localStorage.getItem('auth_payload');
             
             if (tg.initData) {
                 // If in TG context, hide landing and show loader
                 document.getElementById('landing-area').style.display = 'none';
                 document.getElementById('app-container').style.display = 'block';
                 
-                if (savedData) {
+                if (savedAuth && JSON.parse(savedAuth).next_step === NEXT_STEP_FILL_DRIVER_PROFILE) {
+                    showNextStepCard(JSON.parse(savedAuth));
+                } else if (savedData) {
                     showProfile(JSON.parse(savedData));
                 } else {
                     login(tg.initData);
