@@ -1,355 +1,180 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logistika AI - Foydalanuvchi Profili</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logistika AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --primary: #38bdf8;
-            --primary-glow: rgba(56, 189, 248, 0.5);
-            --bg-dark: #020617;
-            --card-bg: rgba(15, 23, 42, 0.6);
-            --border: rgba(255, 255, 255, 0.1);
-            --text: #f8fafc;
-            --text-dim: #94a3b8;
-            --success: #4ade80;
-            --error: #f87171;
-            --tg-blue: #0088cc;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: 'Outfit', sans-serif; 
-            background: var(--bg-dark); 
-            color: var(--text); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        .bg-glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%); z-index: -1; filter: blur(80px); animation: move 15s infinite alternate; }
-        @keyframes move { from { transform: translate(-30%, -30%); } to { transform: translate(30%, 30%); } }
-
-        .container { 
-            width: 90%; 
-            max-width: 420px; 
-            background: var(--card-bg); 
-            backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px); 
-            border: 1px solid var(--border); 
-            border-radius: 2.5rem; 
-            padding: 2.5rem; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
-            z-index: 10;
-            display: none; /* Hidden by default, shown if TG context found */
-        }
-
-        /* Landing Page Styles */
-        .landing-container {
-            width: 100%;
-            max-width: 1200px;
-            padding: 2rem;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-            animation: fadeIn 1s ease-out;
-        }
-
-        .hero-image {
-            width: 100%;
-            max-width: 800px;
-            border-radius: 2rem;
-            box-shadow: 0 0 40px var(--primary-glow);
-            border: 1px solid var(--border);
-            margin-bottom: 2rem;
-            transition: transform 0.5s ease;
-        }
-        .hero-image:hover {
-            transform: scale(1.02);
-        }
-
-        .hero-content {
-            max-width: 800px;
-        }
-
-        .hero-content h1 {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-content p {
-            font-size: clamp(1.1rem, 3vw, 1.4rem);
-            color: var(--text-dim);
-            margin-bottom: 2.5rem;
-        }
-
-        .cta-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .btn-tg {
-            background: var(--tg-blue);
-            color: white;
-            padding: 1.25rem 2.5rem;
-            border-radius: 100px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.4);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .btn-tg:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(0, 136, 204, 0.6);
-        }
-
-        .tg-icon {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        #status-area { text-align: center; margin-bottom: 1.5rem; }
-        .badge { padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); }
-
-        .profile-card { text-align: center; display: none; }
-        .avatar { width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), #818cf8); border-radius: 25px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: white; box-shadow: 0 10px 20px rgba(56,189,248,0.3); }
-        
-        h2 { font-size: 1.5rem; margin-bottom: 0.25rem; }
-        .role-tag { font-size: 0.75rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 1.5rem; display: block; }
-
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-        .info-item { background: rgba(15,23,42,0.5); padding: 1rem; border-radius: 1.25rem; border: 1px solid var(--border); text-align: left; }
-        .info-item span { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.25rem; }
-        .info-item b { font-size: 0.9rem; color: var(--text); }
-
-        .btn { width: 100%; padding: 1rem; border-radius: 1rem; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 0.75rem; font-family: inherit; }
-        .btn-primary { background: var(--primary); color: #000; }
-        .btn-primary:hover { background: #7dd3fc; transform: translateY(-2px); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
-        .btn-outline:hover { color: white; border-color: var(--text-dim); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      :root {
+        --bg: #020617;
+        --card: rgba(15, 23, 42, 0.7);
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --primary: #38bdf8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 34rem),
+          radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.14), transparent 32rem),
+          var(--bg);
+        color: var(--text);
+        font-family: Outfit, system-ui, sans-serif;
+      }
+      main {
+        width: min(92vw, 560px);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        background: var(--card);
+        padding: 32px;
+        text-align: center;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.42);
+        backdrop-filter: blur(22px);
+      }
+      .logo {
+        width: 64px;
+        height: 64px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 18px;
+        border-radius: 22px;
+        background: rgba(56, 189, 248, 0.14);
+        color: var(--primary);
+        font-weight: 800;
+        font-size: 22px;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 7vw, 44px);
+        line-height: 1;
+      }
+      p {
+        margin: 14px 0 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      .status {
+        margin-top: 22px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .error {
+        color: #fca5a5;
+        border-color: rgba(248, 113, 113, 0.35);
+        background: rgba(248, 113, 113, 0.08);
+      }
     </style>
-</head>
-<body>
-    <div class="bg-glow"></div>
-
-    <!-- Landing Section -->
-    <div id="landing-area" class="landing-container">
-        <img src="hero.png" alt="Logistika AI Hero" class="hero-image">
-        <div class="hero-content">
-            <h1>Logistika Kelajagi <br><span>Sun'iy Intellekt Bilan</span></h1>
-            <p>Logistika operatsiyalaringizni aqlli robot yordamida boshqaring. Yuklarni kuzatish, marshrutlarni optimallashtirish va tezkor aloqa — barchasi bir joyda, @Logistika_AIbot bilan.</p>
-            
-            <div class="cta-group">
-                <a href="https://t.me/Logistika_AIbot" class="btn-tg">
-                    <svg class="tg-icon" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-                    </svg>
-                    Botga Kirish
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- App/Profile Container -->
-    <div class="container" id="app-container">
-        <div id="status-area">
-            <span class="badge" id="status-msg">🔄 Yuklanmoqda...</span>
-        </div>
-
-        <div id="profile-area" class="profile-card">
-            <div class="avatar" id="u-ava">?</div>
-            <h2 id="u-name">Foydalanuvchi</h2>
-            <span class="role-tag" id="u-role">Noma'lum</span>
-
-            <div class="info-grid">
-                <div class="info-item">
-                    <span>Telefon</span>
-                    <b id="u-phone">-</b>
-                </div>
-                <div class="info-item">
-                    <span>Balans</span>
-                    <b id="u-balance" style="color: var(--success);">0 UZS</b>
-                </div>
-                <div class="info-item" style="grid-column: span 2;">
-                    <span>User ID</span>
-                    <b id="u-id">#000000</b>
-                </div>
-            </div>
-
-            <div id="admin-action"></div>
-            <button class="btn btn-outline" onclick="logout()">Chiqish</button>
-        </div>
-
-        <div id="retry-area" style="display: none;">
-            <button class="btn btn-primary" onclick="location.reload()">Qayta urinish</button>
-        </div>
-    </div>
-
+  </head>
+  <body>
+    <main>
+      <div class="logo">LA</div>
+      <h1>Logistika AI</h1>
+      <p>Hisob tekshirilmoqda. Role bo‘yicha kerakli sahifaga yo‘naltirilasiz.</p>
+      <div id="status" class="status">Yuklanmoqda...</div>
+    </main>
     <script>
-        const tg = window.Telegram.WebApp;
-        const ADMIN_ID = 7915740408;
-        const NEXT_STEP_DONE = 'done';
-        const NEXT_STEP_FILL_DRIVER_PROFILE = 'fill_driver_profile';
+      const tg = window.Telegram?.WebApp;
+      tg?.ready?.();
+      tg?.expand?.();
+      tg?.setHeaderColor?.('#020617');
 
-        function updateStatus(msg, isError = false) {
-            const el = document.getElementById('status-msg');
-            el.textContent = msg;
-            el.style.color = isError ? 'var(--error)' : 'inherit';
+      const ACCESS_KEY = 'admin_access_token';
+      const REFRESH_KEY = 'admin_refresh_token';
+      const USER_KEY = 'admin_user';
+      const statusEl = document.getElementById('status');
+
+      function setStatus(text, isError = false) {
+        statusEl.textContent = text;
+        statusEl.className = isError ? 'status error' : 'status';
+      }
+
+      function saveSession(payload, user) {
+        localStorage.setItem(ACCESS_KEY, payload.access_token);
+        localStorage.setItem(REFRESH_KEY, payload.refresh_token);
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+      }
+
+      async function requestJson(url, options = {}) {
+        const res = await fetch(url, options);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.detail || data.message || 'So‘rov bajarilmadi');
+        return data;
+      }
+
+      async function getMe(token) {
+        return requestJson('/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+
+      async function loginWithTelegram() {
+        if (!tg?.initData) {
+          throw new Error('Telegram WebApp sessiyasi topilmadi. Iltimos, bot ichidan oching.');
         }
+        return requestJson('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ init_data: tg.initData }),
+        });
+      }
 
-        function getAuthHeaders() {
-            const token = localStorage.getItem('access_token');
-            return {
-                'Content-Type': 'application/json',
-                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-            };
+      function redirectByRole(user) {
+        if (user.role === 'admin') {
+          window.location.replace('/admin/');
+          return;
         }
+        setStatus(`${user.role || 'guest'} role bilan kirdingiz. Ushbu role uchun web sahifa tayyorlanmoqda.`);
+      }
 
-        async function getMyProfile() {
-            const res = await fetch('/auth/me', { headers: getAuthHeaders() });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.detail || 'Profilni olishda xatolik');
-            return data;
-        }
+      async function boot() {
+        try {
+          let token = localStorage.getItem(ACCESS_KEY);
+          let user = null;
 
-        function showNextStepCard(authPayload) {
-            document.getElementById('landing-area').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-            document.getElementById('status-area').style.display = 'none';
-
-            const area = document.getElementById('profile-area');
-            const role = authPayload.role || 'Noma\'lum';
-            area.style.display = 'block';
-            area.style.animation = 'fadeIn 0.5s ease';
-
-            document.getElementById('u-name').textContent = "Profil to'ldirish kerak";
-            document.getElementById('u-ava').textContent = role[0]?.toUpperCase() || '?';
-            document.getElementById('u-role').textContent = role;
-            document.getElementById('u-phone').textContent = '-';
-            document.getElementById('u-id').textContent = '#-';
-            document.getElementById('u-balance').textContent = '0 UZS';
-
-            const actions = document.getElementById('admin-action');
-            actions.innerHTML = '';
-            const profileBtn = document.createElement('button');
-            profileBtn.className = 'btn btn-primary';
-            profileBtn.innerHTML = '📝 Driver profilini to‘ldirish';
-            profileBtn.onclick = () => {
-                tg?.showAlert?.("Profil ma'lumotlarini to'ldirish oynasini frontendda oching yoki bot orqali davom eting.");
-            };
-            actions.appendChild(profileBtn);
-        }
-
-        async function login(initData) {
+          if (token) {
             try {
-                const res = await fetch('/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ init_data: initData })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.detail || 'Xatolik yuz berdi');
-
-                localStorage.setItem('access_token', data.access_token);
-                localStorage.setItem('auth_payload', JSON.stringify(data));
-
-                if (data.next_step === NEXT_STEP_FILL_DRIVER_PROFILE) {
-                    showNextStepCard(data);
-                    return;
-                }
-
-                const profile = await getMyProfile();
-                localStorage.setItem('user_data', JSON.stringify(profile));
-                showProfile(profile);
-            } catch (e) {
-                updateStatus(e.message, true);
-                document.getElementById('retry-area').style.display = 'block';
+              user = await getMe(token);
+            } catch {
+              localStorage.removeItem(ACCESS_KEY);
+              localStorage.removeItem(REFRESH_KEY);
+              localStorage.removeItem(USER_KEY);
+              token = null;
             }
+          }
+
+          if (!token) {
+            setStatus('Telegram orqali avtorizatsiya qilinmoqda...');
+            const payload = await loginWithTelegram();
+            token = payload.access_token;
+            user = await getMe(token);
+            saveSession(payload, user);
+          }
+
+          redirectByRole(user);
+        } catch (err) {
+          setStatus(err.message || 'Kirishda xatolik yuz berdi', true);
         }
+      }
 
-        function showProfile(user) {
-            document.getElementById('landing-area').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-            
-            document.getElementById('status-area').style.display = 'none';
-            const area = document.getElementById('profile-area');
-            area.style.display = 'block';
-            area.style.animation = 'fadeIn 0.5s ease';
-
-            document.getElementById('u-name').textContent = user.full_name || "Ism kiritilmagan";
-            document.getElementById('u-ava').textContent = (user.full_name || "?")[0].toUpperCase();
-            document.getElementById('u-role').textContent = user.role;
-            document.getElementById('u-phone').textContent = user.phone_number || "-";
-            document.getElementById('u-id').textContent = "#" + user.user_id;
-            document.getElementById('u-balance').textContent = (user.balance || 0) + " UZS";
-
-            if (user.user_id == ADMIN_ID || user.role === 'admin') {
-                const adminBtn = document.createElement('button');
-                adminBtn.className = 'btn btn-primary';
-                adminBtn.innerHTML = '⚙️ Admin Panel';
-                adminBtn.onclick = () => window.location.href = 'admin/index.html';
-                document.getElementById('admin-action').appendChild(adminBtn);
-            }
-            
-            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        }
-
-        function logout() {
-            localStorage.clear();
-            location.reload();
-        }
-
-        window.onload = () => {
-            tg.ready();
-            tg.expand();
-            tg.setHeaderColor('#020617');
-
-            const savedData = localStorage.getItem('user_data');
-            const savedAuth = localStorage.getItem('auth_payload');
-            
-            if (tg.initData) {
-                // If in TG context, hide landing and show loader
-                document.getElementById('landing-area').style.display = 'none';
-                document.getElementById('app-container').style.display = 'block';
-                
-                if (savedAuth && JSON.parse(savedAuth).next_step === NEXT_STEP_FILL_DRIVER_PROFILE) {
-                    showNextStepCard(JSON.parse(savedAuth));
-                } else if (savedData) {
-                    showProfile(JSON.parse(savedData));
-                } else {
-                    login(tg.initData);
-                }
-            } else {
-                // Not in TG context, show landing page (default state)
-                console.log("Web mode: Showing landing page");
-            }
-        };
+      boot();
     </script>
-</body>
+  </body>
 </html>

@@ -4,15 +4,22 @@ import { useTranslation } from 'react-i18next';
 
 import Sidebar from './Sidebar.jsx';
 import LangSwitcher from './LangSwitcher.jsx';
+import { auth } from '../lib/api.js';
 import { logout } from '../lib/auth.js';
 
 export default function AdminLayout() {
   const { t } = useTranslation();
   const nav = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    nav('/login', { replace: true });
+  const handleLogout = async () => {
+    try {
+      await auth.logout();
+    } catch {
+      // Token allaqachon yaroqsiz bo'lsa ham local sessiyani yopamiz.
+    } finally {
+      logout();
+      nav('/login', { replace: true });
+    }
   };
 
   return (

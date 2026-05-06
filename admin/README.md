@@ -30,8 +30,12 @@ yoki ID env'dagi `ADMIN_IDS` ichida bo'lishi shart, aks holda kirish rad etiladi
 
 ## API base
 
-`VITE_API_BASE` env (default `''` — proxy orqali). Dev'da Vite `vite.config.js` dan
-`/auth`, `/admin/*`, `/orders`, `/drivers` ni `http://localhost:8000` ga proxy qiladi.
+`VITE_API_BASE` env (default `/api` — nginx/Vite proxy orqali). Dev'da Vite
+`/api/*` ni `http://localhost:8000/*` ga rewrite qiladi.
+
+Muhim: admin SPA sahifalari `/admin/users`, `/admin/orders` kabi route'larda
+ochiladi. Backend API esa frontenddan `/api/admin/users`, `/api/admin/orders`
+ko'rinishida chaqiriladi, shunda real sahifalar va API path'lari aralashmaydi.
 
 ## Nginx (prod)
 

@@ -15,3 +15,7 @@
 
 # Deployment artifacts
 *.tar.gz
+
+# Admin SPA local/build artifacts
+admin/node_modules/
+admin/dist/

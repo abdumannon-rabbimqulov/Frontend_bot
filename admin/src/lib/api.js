@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { getToken, logout } from './auth.js';
+import { getRefreshToken, getToken, logout } from './auth.js';
 
-const baseURL = import.meta.env.VITE_API_BASE || '';
+const baseURL = import.meta.env.VITE_API_BASE || '/api';
 
 export const http = axios.create({
   baseURL,
@@ -31,6 +31,11 @@ http.interceptors.response.use(
 export const auth = {
   loginWithTelegram: (init_data) => http.post('/auth/login', { init_data }).then((r) => r.data),
   me: () => http.get('/auth/me').then((r) => r.data),
+  logout: () => {
+    const refresh_token = getRefreshToken();
+    if (!refresh_token) return Promise.resolve({ detail: 'No refresh token' });
+    return http.post('/auth/logout', null, { params: { refresh_token } }).then((r) => r.data);
+  },
 };
 
 export const dashboard = {
@@ -85,8 +90,11 @@ export const tariffs = {
 };
 
 export function buildWsUrl(path) {
-  const base = baseURL || window.location.origin;
-  const url = new URL(path, base);
+  const normalizedBase = baseURL.startsWith('http')
+    ? baseURL
+    : `${window.location.origin}${baseURL}`;
+  const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
+  const url = new URL(normalizedPath, `${normalizedBase.replace(/\/$/, '')}/`);
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
   const token = getToken();
   if (token) url.searchParams.set('token', token);

@@ -5,7 +5,7 @@ import { ShieldAlert, LogIn, Loader2 } from 'lucide-react';
 
 import LangSwitcher from '../components/LangSwitcher.jsx';
 import { auth } from '../lib/api.js';
-import { setToken, setUser, isAdmin } from '../lib/auth.js';
+import { setRefreshToken, setToken, setUser, isAdmin } from '../lib/auth.js';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -23,6 +23,7 @@ export default function Login() {
     try {
       const data = await auth.loginWithTelegram(tg.initData);
       setToken(data.access_token);
+      setRefreshToken(data.refresh_token);
       const me = await auth.me();
       setUser(me);
       if (!isAdmin(me)) {

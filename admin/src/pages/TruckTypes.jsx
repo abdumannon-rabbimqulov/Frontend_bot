@@ -8,7 +8,18 @@ import StatusBadge from '../components/StatusBadge.jsx';
 import Modal from '../components/Modal.jsx';
 import { truckTypes } from '../lib/api.js';
 
-const empty = { name: '', max_weight: '', max_volume: '', description: '', is_active: true };
+const empty = {
+  name: '',
+  max_weight: '',
+  max_volume: '',
+  length: '',
+  width: '',
+  height: '',
+  pallet_capacity: '',
+  image_url: '',
+  description: '',
+  is_active: true,
+};
 
 export default function TruckTypes() {
   const { t } = useTranslation();
@@ -63,6 +74,11 @@ export default function TruckTypes() {
                 name: r.name,
                 max_weight: r.max_weight,
                 max_volume: r.max_volume,
+                length: r.length || '',
+                width: r.width || '',
+                height: r.height || '',
+                pallet_capacity: r.pallet_capacity || '',
+                image_url: r.image_url || '',
                 description: r.description || '',
                 is_active: r.is_active,
               });
@@ -90,6 +106,12 @@ export default function TruckTypes() {
       ...form,
       max_weight: Number(form.max_weight),
       max_volume: Number(form.max_volume),
+      length: form.length === '' ? null : Number(form.length),
+      width: form.width === '' ? null : Number(form.width),
+      height: form.height === '' ? null : Number(form.height),
+      pallet_capacity: form.pallet_capacity === '' ? null : Number(form.pallet_capacity),
+      image_url: form.image_url || null,
+      description: form.description || null,
     };
     mut.mutate({ id: editing?.id, data: payload });
   };
@@ -162,6 +184,52 @@ export default function TruckTypes() {
                 value={form.max_volume}
                 onChange={(e) => setForm((f) => ({ ...f, max_volume: e.target.value }))}
                 required
+              />
+            </Field>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <Field label="Length (m)">
+              <input
+                type="number"
+                step="0.01"
+                className="input w-full"
+                value={form.length}
+                onChange={(e) => setForm((f) => ({ ...f, length: e.target.value }))}
+              />
+            </Field>
+            <Field label="Width (m)">
+              <input
+                type="number"
+                step="0.01"
+                className="input w-full"
+                value={form.width}
+                onChange={(e) => setForm((f) => ({ ...f, width: e.target.value }))}
+              />
+            </Field>
+            <Field label="Height (m)">
+              <input
+                type="number"
+                step="0.01"
+                className="input w-full"
+                value={form.height}
+                onChange={(e) => setForm((f) => ({ ...f, height: e.target.value }))}
+              />
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Pallet capacity">
+              <input
+                type="number"
+                className="input w-full"
+                value={form.pallet_capacity}
+                onChange={(e) => setForm((f) => ({ ...f, pallet_capacity: e.target.value }))}
+              />
+            </Field>
+            <Field label="Image URL">
+              <input
+                className="input w-full"
+                value={form.image_url}
+                onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
               />
             </Field>
           </div>

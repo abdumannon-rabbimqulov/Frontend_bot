@@ -7,15 +7,12 @@ export default defineConfig({
   server: {
     port: 5174,
     proxy: {
-      '/auth': 'http://localhost:8000',
-      '/admin/dashboard': 'http://localhost:8000',
-      '/admin/users': 'http://localhost:8000',
-      '/admin/orders': 'http://localhost:8000',
-      '/admin/ai': 'http://localhost:8000',
-      '/admin/drivers': 'http://localhost:8000',
-      '/admin/tariffs': 'http://localhost:8000',
-      '/orders': 'http://localhost:8000',
-      '/drivers': 'http://localhost:8000',
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
     },
   },
   build: {
