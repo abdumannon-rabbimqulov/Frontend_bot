@@ -5,6 +5,10 @@ export default function ProtectedRoute({ children }) {
   const token = getToken();
   const user = getUser();
   const loc = useLocation();
+  if (localStorage.getItem('logistika_logged_out') === '1') {
+    window.location.replace('/');
+    return null;
+  }
   if (!token || !user || !isAdmin(user)) {
     return <Navigate to="/login" replace state={{ from: loc.pathname }} />;
   }

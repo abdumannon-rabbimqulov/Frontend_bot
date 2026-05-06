@@ -175,7 +175,9 @@
     "active": "Faol",
     "create": "Yangi qo'shish",
     "edit": "Tahrirlash",
-    "delete": "O'chirish"
+    "delete": "O'chirish",
+    "image": "Rasm",
+    "currentImage": "Hozirgi rasm"
   },
   "tariffs": {
     "title": "Tariflar / oylik to'lovlar",

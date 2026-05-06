@@ -81,14 +81,48 @@
         border-color: rgba(248, 113, 113, 0.35);
         background: rgba(248, 113, 113, 0.08);
       }
+      .actions {
+        display: none;
+        gap: 10px;
+        margin-top: 22px;
+      }
+      .actions.show {
+        display: grid;
+      }
+      button,
+      a {
+        min-height: 46px;
+        border-radius: 14px;
+        border: 0;
+        font: inherit;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .primary {
+        background: var(--primary);
+        color: #020617;
+      }
+      .outline {
+        border: 1px solid var(--border);
+        color: var(--text);
+        background: transparent;
+      }
     </style>
   </head>
   <body>
     <main>
       <div class="logo">LA</div>
       <h1>Logistika AI</h1>
-      <p>Hisob tekshirilmoqda. Role bo‘yicha kerakli sahifaga yo‘naltirilasiz.</p>
-      <div id="status" class="status">Yuklanmoqda...</div>
+      <p id="lead">Kirish faqat Telegram orqali amalga oshiriladi.</p>
+      <div id="status" class="status">Bot ichidagi WebApp tugmasidan foydalaning.</div>
+      <div id="actions" class="actions">
+        <button id="tg-login-btn" class="primary" type="button">Telegram orqali kirish</button>
+        <a class="outline" href="https://t.me/Logistika_AIbot">Botni ochish</a>
+      </div>
     </main>
     <script>
       const tg = window.Telegram?.WebApp;
@@ -99,11 +133,21 @@
       const ACCESS_KEY = 'admin_access_token';
       const REFRESH_KEY = 'admin_refresh_token';
       const USER_KEY = 'admin_user';
+      const LOGGED_OUT_KEY = 'logistika_logged_out';
       const statusEl = document.getElementById('status');
+      const leadEl = document.getElementById('lead');
+      const actionsEl = document.getElementById('actions');
+      const tgLoginBtn = document.getElementById('tg-login-btn');
 
       function setStatus(text, isError = false) {
         statusEl.textContent = text;
         statusEl.className = isError ? 'status error' : 'status';
+      }
+
+      function showTelegramOffer(text) {
+        leadEl.textContent = 'Kirish faqat Telegram orqali amalga oshiriladi.';
+        setStatus(text || 'Bot ichidagi WebApp tugmasidan foydalaning.');
+        actionsEl.classList.add('show');
       }
 
       function saveSession(payload, user) {
@@ -145,34 +189,42 @@
       }
 
       async function boot() {
-        try {
-          let token = localStorage.getItem(ACCESS_KEY);
-          let user = null;
+        const loggedOut = localStorage.getItem(LOGGED_OUT_KEY) === '1';
+        if (loggedOut) {
+          showTelegramOffer('Siz tizimdan chiqdingiz. Qayta kirish uchun Telegram tugmasini bosing.');
+          return;
+        }
 
-          if (token) {
-            try {
-              user = await getMe(token);
-            } catch {
-              localStorage.removeItem(ACCESS_KEY);
-              localStorage.removeItem(REFRESH_KEY);
-              localStorage.removeItem(USER_KEY);
-              token = null;
+        const cachedUser = localStorage.getItem(USER_KEY);
+        const token = localStorage.getItem(ACCESS_KEY);
+        if (token && cachedUser) {
+          try {
+            const user = JSON.parse(cachedUser);
+            if (user?.role === 'admin') {
+              window.location.replace('/admin/');
+              return;
             }
+          } catch {
+            localStorage.removeItem(USER_KEY);
           }
+        }
 
-          if (!token) {
-            setStatus('Telegram orqali avtorizatsiya qilinmoqda...');
-            const payload = await loginWithTelegram();
-            token = payload.access_token;
-            user = await getMe(token);
-            saveSession(payload, user);
-          }
+        showTelegramOffer('Telegram orqali kirish tugmasini bosing.');
+      }
 
+      tgLoginBtn.addEventListener('click', async () => {
+        localStorage.removeItem(LOGGED_OUT_KEY);
+        actionsEl.classList.remove('show');
+        setStatus('Telegram orqali avtorizatsiya qilinmoqda...');
+        try {
+          const payload = await loginWithTelegram();
+          const user = await getMe(payload.access_token);
+          saveSession(payload, user);
           redirectByRole(user);
         } catch (err) {
-          setStatus(err.message || 'Kirishda xatolik yuz berdi', true);
+          showTelegramOffer(err.message || 'Kirishda xatolik yuz berdi');
         }
-      }
+      });
 
       boot();
     </script>

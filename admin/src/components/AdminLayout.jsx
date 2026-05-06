@@ -18,7 +18,8 @@ export default function AdminLayout() {
       // Token allaqachon yaroqsiz bo'lsa ham local sessiyani yopamiz.
     } finally {
       logout();
-      nav('/login', { replace: true });
+      localStorage.setItem('logistika_logged_out', '1');
+      window.location.replace('/');
     }
   };
 

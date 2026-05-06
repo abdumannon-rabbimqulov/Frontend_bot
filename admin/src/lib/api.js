@@ -34,7 +34,7 @@ export const auth = {
   logout: () => {
     const refresh_token = getRefreshToken();
     if (!refresh_token) return Promise.resolve({ detail: 'No refresh token' });
-    return http.post('/auth/logout', null, { params: { refresh_token } }).then((r) => r.data);
+    return http.post('/auth/logout', { refresh_token }).then((r) => r.data);
   },
 };
 
@@ -68,6 +68,15 @@ export const drivers = {
 
 export const truckTypes = {
   list: () => http.get('/drivers/truck-types').then((r) => r.data),
+  uploadImage: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return http
+      .post('/drivers/truck-types/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then((r) => r.data);
+  },
   create: (data) => http.post('/drivers/truck-types', data).then((r) => r.data),
   update: (id, data) => http.patch(`/drivers/truck-types/${id}`, data).then((r) => r.data),
   remove: (id) => http.delete(`/drivers/truck-types/${id}`).then((r) => r.data),

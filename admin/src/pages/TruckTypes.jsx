@@ -26,16 +26,24 @@ export default function TruckTypes() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(empty);
+  const [imageFile, setImageFile] = useState(null);
 
   const q = useQuery({ queryKey: ['truckTypes'], queryFn: truckTypes.list });
 
   const mut = useMutation({
-    mutationFn: ({ id, data }) =>
-      id ? truckTypes.update(id, data) : truckTypes.create(data),
+    mutationFn: async ({ id, data, file }) => {
+      const payload = { ...data };
+      if (file) {
+        const uploaded = await truckTypes.uploadImage(file);
+        payload.image_url = uploaded.url;
+      }
+      return id ? truckTypes.update(id, payload) : truckTypes.create(payload);
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['truckTypes'] });
       setEditing(null);
       setForm(empty);
+      setImageFile(null);
     },
   });
 
@@ -70,6 +78,7 @@ export default function TruckTypes() {
           <button
             onClick={() => {
               setEditing(r);
+              setImageFile(null);
               setForm({
                 name: r.name,
                 max_weight: r.max_weight,
@@ -113,7 +122,7 @@ export default function TruckTypes() {
       image_url: form.image_url || null,
       description: form.description || null,
     };
-    mut.mutate({ id: editing?.id, data: payload });
+    mut.mutate({ id: editing?.id, data: payload, file: imageFile });
   };
 
   return (
@@ -124,6 +133,7 @@ export default function TruckTypes() {
           onClick={() => {
             setEditing({});
             setForm(empty);
+            setImageFile(null);
           }}
           className="btn-primary"
         >
@@ -142,6 +152,7 @@ export default function TruckTypes() {
         onClose={() => {
           setEditing(null);
           setForm(empty);
+          setImageFile(null);
         }}
         title={editing?.id ? t('truckTypes.edit') : t('truckTypes.create')}
         footer={
@@ -151,12 +162,13 @@ export default function TruckTypes() {
               onClick={() => {
                 setEditing(null);
                 setForm(empty);
+                setImageFile(null);
               }}
             >
               {t('common.cancel')}
             </button>
-            <button className="btn-primary" onClick={submit}>
-              {t('common.save')}
+            <button className="btn-primary" onClick={submit} disabled={mut.isPending}>
+              {mut.isPending ? t('common.loading') : t('common.save')}
             </button>
           </>
         }
@@ -225,14 +237,29 @@ export default function TruckTypes() {
                 onChange={(e) => setForm((f) => ({ ...f, pallet_capacity: e.target.value }))}
               />
             </Field>
-            <Field label="Image URL">
+            <Field label={t('truckTypes.image')}>
               <input
+                type="file"
+                accept="image/*"
                 className="input w-full"
-                value={form.image_url}
-                onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
+                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
               />
             </Field>
           </div>
+          {(imageFile || form.image_url) && (
+            <div className="rounded-xl border border-white/10 bg-white/5 p-2">
+              <p className="mb-2 text-xs text-muted">
+                {imageFile ? imageFile.name : t('truckTypes.currentImage')}
+              </p>
+              {form.image_url && !imageFile && (
+                <img
+                  src={form.image_url}
+                  alt={form.name || t('truckTypes.image')}
+                  className="h-24 w-24 rounded-lg object-cover"
+                />
+              )}
+            </div>
+          )}
           <Field label="Description">
             <textarea
               className="input w-full"

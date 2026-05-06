@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #020617;
+  --card: rgba(15, 23, 42, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --primary: #38bdf8;
+  --success: #4ade80;
+  --danger: #f87171;
+  --warning: #facc15;
+  --muted: #94a3b8;
+}
+
+body {
+  background: #020617;
+  color: #f8fafc;
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+}
+
+.input {
+  @apply rounded-xl bg-white/[0.04] border border-white/10 px-3 py-2 text-sm text-white placeholder:text-muted focus:outline-none focus:border-primary/60;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-bg transition hover:brightness-110 disabled:opacity-60;
+}
+
+.panel {
+  @apply rounded-3xl border border-border bg-card backdrop-blur-xl;
+}
