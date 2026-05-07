@@ -30,14 +30,14 @@ export const truckTypes = {
   list: () => http.get('/drivers/truck-types').then((r) => r.data),
 };
 
-// Driver loads & offers (mock-ready for UI)
+// Backendda yuklar /orders routerida, frontend esa ularni "loads" deb ko'rsatadi.
 export const loads = {
-  list: (params = {}) => http.get('/drivers/loads', { params }).then((r) => r.data).catch(() => []),
-  get: (id) => http.get(`/drivers/loads/${id}`).then((r) => r.data).catch(() => null),
+  list: (params = {}) => http.get('/orders/', { params }).then((r) => r.data).catch(() => []),
+  get: (id) => http.get(`/orders/${id}`).then((r) => r.data).catch(() => null),
 };
 
 export const offers = {
-  create: (loadId, data) => http.post(`/drivers/loads/${loadId}/offers`, data).then((r) => r.data),
+  create: (loadId, data) => http.post(`/orders/${loadId}/offers`, data).then((r) => r.data),
 };
 
 export const trips = {

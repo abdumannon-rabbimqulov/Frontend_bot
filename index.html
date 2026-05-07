@@ -3,151 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Logistika AI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <title>Logistika</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-      :root {
-        --bg: #020617;
-        --card: rgba(15, 23, 42, 0.7);
-        --border: rgba(255, 255, 255, 0.1);
-        --text: #f8fafc;
-        --muted: #94a3b8;
-        --primary: #38bdf8;
-      }
-      * {
-        box-sizing: border-box;
-      }
       body {
         margin: 0;
         min-height: 100vh;
         display: grid;
         place-items: center;
-        background:
-          radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 34rem),
-          radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.14), transparent 32rem),
-          var(--bg);
-        color: var(--text);
-        font-family: Outfit, system-ui, sans-serif;
-      }
-      main {
-        width: min(92vw, 560px);
-        border: 1px solid var(--border);
-        border-radius: 28px;
-        background: var(--card);
-        padding: 32px;
-        text-align: center;
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.42);
-        backdrop-filter: blur(22px);
-      }
-      .logo {
-        width: 64px;
-        height: 64px;
-        display: grid;
-        place-items: center;
-        margin: 0 auto 18px;
-        border-radius: 22px;
-        background: rgba(56, 189, 248, 0.14);
-        color: var(--primary);
-        font-weight: 800;
-        font-size: 22px;
-      }
-      h1 {
-        margin: 0;
-        font-size: clamp(28px, 7vw, 44px);
-        line-height: 1;
-      }
-      p {
-        margin: 14px 0 0;
-        color: var(--muted);
-        line-height: 1.6;
-      }
-      .status {
-        margin-top: 22px;
-        padding: 12px 14px;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.04);
-        color: var(--muted);
-        font-weight: 600;
-      }
-      .error {
-        color: #fca5a5;
-        border-color: rgba(248, 113, 113, 0.35);
-        background: rgba(248, 113, 113, 0.08);
-      }
-      .actions {
-        display: none;
-        gap: 10px;
-        margin-top: 22px;
-      }
-      .actions.show {
-        display: grid;
-      }
-      button,
-      a {
-        min-height: 46px;
-        border-radius: 14px;
-        border: 0;
-        font: inherit;
-        font-weight: 700;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-      }
-      .primary {
-        background: var(--primary);
-        color: #020617;
-      }
-      .outline {
-        border: 1px solid var(--border);
-        color: var(--text);
-        background: transparent;
+        background: #020617;
+        color: #cbd5e1;
+        font-family: system-ui, sans-serif;
       }
     </style>
   </head>
   <body>
-    <main>
-      <div class="logo">LA</div>
-      <h1>Logistika AI</h1>
-      <p id="lead">Kirish faqat Telegram orqali amalga oshiriladi.</p>
-      <div id="status" class="status">Bot ichidagi WebApp tugmasidan foydalaning.</div>
-      <div id="actions" class="actions">
-        <button id="tg-login-btn" class="primary" type="button">Telegram orqali kirish</button>
-        <a class="outline" href="https://t.me/Logistika_AIbot">Botni ochish</a>
-      </div>
-    </main>
+    <div>Yo'naltirilmoqda...</div>
     <script>
       const tg = window.Telegram?.WebApp;
       tg?.ready?.();
       tg?.expand?.();
-      tg?.setHeaderColor?.('#020617');
 
       const ACCESS_KEY = 'admin_access_token';
       const REFRESH_KEY = 'admin_refresh_token';
       const USER_KEY = 'admin_user';
       const LOGGED_OUT_KEY = 'logistika_logged_out';
-      const statusEl = document.getElementById('status');
-      const leadEl = document.getElementById('lead');
-      const actionsEl = document.getElementById('actions');
-      const tgLoginBtn = document.getElementById('tg-login-btn');
 
-      function setStatus(text, isError = false) {
-        statusEl.textContent = text;
-        statusEl.className = isError ? 'status error' : 'status';
+      function normalizeRole(role) {
+        return String(role || '').trim().toLowerCase();
       }
 
-      function showTelegramOffer(text) {
-        leadEl.textContent = 'Kirish faqat Telegram orqali amalga oshiriladi.';
-        setStatus(text || 'Bot ichidagi WebApp tugmasidan foydalaning.');
-        actionsEl.classList.add('show');
+      function redirectByRole(user) {
+        const role = normalizeRole(user?.role);
+        if (role === 'admin') {
+          window.location.replace('/admin/');
+          return;
+        }
+        window.location.replace('/drivers/');
       }
 
       function saveSession(payload, user) {
@@ -159,8 +51,17 @@
       async function requestJson(url, options = {}) {
         const res = await fetch(url, options);
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.detail || data.message || 'So‘rov bajarilmadi');
+        if (!res.ok) throw new Error(data.detail || data.message || 'Request failed');
         return data;
+      }
+
+      async function loginWithTelegram() {
+        if (!tg?.initData) return null;
+        return requestJson('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ init_data: tg.initData }),
+        });
       }
 
       async function getMe(token) {
@@ -169,62 +70,36 @@
         });
       }
 
-      async function loginWithTelegram() {
-        if (!tg?.initData) {
-          throw new Error('Telegram WebApp sessiyasi topilmadi. Iltimos, bot ichidan oching.');
-        }
-        return requestJson('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ init_data: tg.initData }),
-        });
-      }
-
-      function redirectByRole(user) {
-        if (user.role === 'admin') {
-          window.location.replace('/admin/');
-          return;
-        }
-        setStatus(`${user.role || 'guest'} role bilan kirdingiz. Ushbu role uchun web sahifa tayyorlanmoqda.`);
-      }
-
       async function boot() {
         const loggedOut = localStorage.getItem(LOGGED_OUT_KEY) === '1';
         if (loggedOut) {
-          showTelegramOffer('Siz tizimdan chiqdingiz. Qayta kirish uchun Telegram tugmasini bosing.');
+          window.location.replace('/drivers/');
           return;
         }
 
-        const cachedUser = localStorage.getItem(USER_KEY);
         const token = localStorage.getItem(ACCESS_KEY);
+        const cachedUser = localStorage.getItem(USER_KEY);
         if (token && cachedUser) {
           try {
-            const user = JSON.parse(cachedUser);
-            if (user?.role === 'admin') {
-              window.location.replace('/admin/');
-              return;
-            }
+            redirectByRole(JSON.parse(cachedUser));
+            return;
           } catch {
             localStorage.removeItem(USER_KEY);
           }
         }
 
-        showTelegramOffer('Telegram orqali kirish tugmasini bosing.');
-      }
-
-      tgLoginBtn.addEventListener('click', async () => {
-        localStorage.removeItem(LOGGED_OUT_KEY);
-        actionsEl.classList.remove('show');
-        setStatus('Telegram orqali avtorizatsiya qilinmoqda...');
         try {
           const payload = await loginWithTelegram();
-          const user = await getMe(payload.access_token);
-          saveSession(payload, user);
-          redirectByRole(user);
-        } catch (err) {
-          showTelegramOffer(err.message || 'Kirishda xatolik yuz berdi');
-        }
-      });
+          if (payload?.access_token) {
+            const user = await getMe(payload.access_token);
+            saveSession(payload, user);
+            redirectByRole(user);
+            return;
+          }
+        } catch (_) {}
+
+        window.location.replace('/drivers/');
+      }
 
       boot();
     </script>

@@ -1,6 +1,6 @@
 #!/bin/bash
-# Backward-compatible wrapper. Frontend is deployed to the backend VPS now.
+# Backward-compatible wrapper. Run Docker frontend deploy from repo root.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-exec bash deploy-logistic-vps.sh "$@"
+exec bash ../deploy-frontend.sh "$@"

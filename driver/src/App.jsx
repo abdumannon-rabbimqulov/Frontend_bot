@@ -14,7 +14,7 @@ const qc = new QueryClient();
 export default function App() {
   return (
     <QueryClientProvider client={qc}>
-      <BrowserRouter basename="/driver">
+      <BrowserRouter basename="/drivers">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<ProtectedRoute><DriverProfileForm /></ProtectedRoute>} />
