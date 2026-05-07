@@ -1,0 +1,11 @@
+.git
+.env
+.DS_Store
+._*
+*.log
+
+admin/node_modules
+admin/dist
+driver/node_modules
+driver/dist
+node_modules

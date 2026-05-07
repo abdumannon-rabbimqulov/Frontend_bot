@@ -1,6 +1,6 @@
 #!/bin/bash
-# Backward-compatible wrapper. Static rsync deploy is replaced by Docker deploy.
+# Backward-compatible wrapper for the standalone frontend deploy.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-exec bash ../deploy-frontend.sh "$@"
+exec bash deploy.sh "$@"

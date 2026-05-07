@@ -19,3 +19,7 @@
 # Admin SPA local/build artifacts
 admin/node_modules/
 admin/dist/
+
+# Driver SPA local/build artifacts
+driver/node_modules/
+driver/dist/
