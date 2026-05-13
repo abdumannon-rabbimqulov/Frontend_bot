@@ -4,7 +4,9 @@ export function getDriverToken() {
 
 export function setDriverSession(payload) {
   localStorage.setItem('driver_access_token', payload.access_token);
-  localStorage.setItem('driver_refresh_token', payload.refresh_token);
+  if (payload.refresh_token != null && payload.refresh_token !== '') {
+    localStorage.setItem('driver_refresh_token', payload.refresh_token);
+  }
   localStorage.setItem('driver_user', JSON.stringify(payload));
 }
 

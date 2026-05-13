@@ -44,7 +44,7 @@ export default function LiveMonitoring() {
   }, []);
 
   useEffect(() => {
-    const url = buildWsUrl('/admin/drivers/locations/stream');
+    const url = buildWsUrl('/system/drivers/locations/stream');
     const ws = new WebSocket(url);
     wsRef.current = ws;
 

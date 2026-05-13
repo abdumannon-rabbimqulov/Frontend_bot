@@ -1,22 +1,32 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import DriverLayout from '../components/DriverLayout';
-
-const mockLoads = [
-  { id: 1, from: 'Toshkent', to: 'Buxoro', weight: '20 000 kg', price: '4 350 000', dist: '585 km', date: 'Bugun, 14:00', type: 'Elektr jihozlari' },
-  { id: 2, from: 'Andijon', to: 'Navoiy', weight: '15 000 kg', price: '5 200 000', dist: '720 km', date: 'Bugun, 18:30', type: 'Qurilish materiallari' },
-  { id: 3, from: 'Samarqand', to: 'Farg‘ona', weight: '12 000 kg', price: '3 100 000', dist: '310 km', date: 'Ertaga, 09:00', type: 'Oziq-ovqat' },
-];
+import { loads } from '../lib/api';
 
 export default function Loads() {
   const nav = useNavigate();
   const [search, setSearch] = useState('');
+  const { data: items = [], isLoading } = useQuery({
+    queryKey: ['driverLoads'],
+    queryFn: () => loads.list(),
+  });
 
-  const filtered = mockLoads.filter(l =>
-    l.from.toLowerCase().includes(search.toLowerCase()) ||
-    l.to.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = items.filter((load) => {
+    const from = String(load?.waypoints?.[0]?.address || '').toLowerCase();
+    const to = String(load?.waypoints?.[load?.waypoints?.length - 1]?.address || '').toLowerCase();
+    const q = search.toLowerCase();
+    return from.includes(q) || to.includes(q);
+  }).map((load) => ({
+    id: load.id,
+    from: load?.waypoints?.[0]?.address || 'Nomaʼlum',
+    to: load?.waypoints?.[load?.waypoints?.length - 1]?.address || 'Nomaʼlum',
+    weight: load.weight ? `${load.weight} t` : '—',
+    price: load.price ? Number(load.price).toLocaleString('ru-RU') : '—',
+    dist: load.total_distance_km ? `${load.total_distance_km} km` : '—',
+    date: load.created_at ? new Date(load.created_at).toLocaleString('uz-UZ') : '—',
+  }));
 
   return (
     <DriverLayout>
@@ -37,6 +47,7 @@ export default function Loads() {
         </div>
 
         <div className="space-y-3">
+          {isLoading && <div className="text-center py-8 text-muted">Yuklar yuklanmoqda...</div>}
           {filtered.map(load => (
             <div key={load.id} onClick={() => nav(`/loads/${load.id}`)} className="panel p-4 active:scale-[0.985] cursor-pointer">
               <div className="flex justify-between text-sm">
@@ -54,7 +65,9 @@ export default function Loads() {
               </div>
             </div>
           ))}
-          {filtered.length === 0 && <div className="text-center py-8 text-muted">Hech qanday yuk topilmadi</div>}
+          {!isLoading && filtered.length === 0 && (
+            <div className="text-center py-8 text-muted">Hozircha yuklar mavjud emas</div>
+          )}
         </div>
       </div>
     </DriverLayout>

@@ -1,107 +1,316 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uz">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Logistika</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistika AI - Innovatsion Logistika Platformasi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        background: #020617;
-        color: #cbd5e1;
-        font-family: system-ui, sans-serif;
-      }
-    </style>
-  </head>
-  <body>
-    <div>Yo'naltirilmoqda...</div>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <img src="hero.png" alt="Logistika Hero" class="hero-img" id="hero-img">
+            
+            <div id="main-auth">
+                <div class="badge">LOGISTIKA AI</div>
+                <h1>Aqlli Logistika Tizimi</h1>
+                <p class="subtitle">Yuk tashish jarayonlarini avtomatlashtirish va samaradorlikni oshirish uchun zamonaviy yechimlar.</p>
+                
+                <div class="features">
+                    <div class="feature-item">
+                        <div class="feature-icon">🚀</div>
+                        <div class="feature-text">Tezkor yetkazib berish</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🛡️</div>
+                        <div class="feature-text">Xavfsiz tashuvlar</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-text">Real vaqtda nazorat</div>
+                    </div>
+                </div>
+
+                <div class="auth-options">
+                    <button class="btn btn-tg" onclick="handleTelegramLogin()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42l10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.703l-.328 4.646c.456 0 .656-.209.911-.457l2.19-2.13l4.557 3.366c.84.463 1.444.225 1.653-.781l2.984-14.07c.306-1.226-.468-1.782-1.274-1.421l-.03.018z" fill="currentColor"/>
+                        </svg>
+                        Telegram orqali kirish
+                    </button>
+                    
+                    <div class="divider">yoki</div>
+                    
+                    <button class="btn btn-phone" onclick="showLoginForm()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.62 10.79c1.44 2.82 3.76 5.14 6.58 6.58l2.2-2.2c.27-.27.67-.36 1.02-.24c1.12.37 2.33.57 3.58.57c.55 0 1 .45 1 1V20c0 .55-.45 1-1 1c-9.39 0-17-7.61-17-17c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1c0 1.25.2 2.46.57 3.58c.11.35.03.74-.25 1.02l-2.22 2.2z" fill="currentColor"/>
+                        </svg>
+                        Platformaga kirish
+                    </button>
+                </div>
+            </div>
+
+            <!-- Login Form (Hidden by default) -->
+            <div id="login-form">
+                <h2 style="font-size: 20px; margin-bottom: 20px;">Kirish</h2>
+                <div class="input-group">
+                    <label for="phone">Telefon raqam</label>
+                    <input type="text" id="phone" placeholder="+998 90 123 45 67">
+                </div>
+                <div class="input-group">
+                    <label for="password">Parol</label>
+                    <input type="password" id="password" placeholder="••••••••">
+                </div>
+                <button class="btn btn-submit" onclick="handlePasswordLogin()">
+                    Kirish
+                </button>
+                <button class="back-btn" onclick="showMainAuth()">Orqaga qaytish</button>
+            </div>
+
+            <div id="status-msg"></div>
+        </div>
+    </div>
+
     <script>
       const tg = window.Telegram?.WebApp;
       tg?.ready?.();
       tg?.expand?.();
 
-      const ACCESS_KEY = 'admin_access_token';
-      const REFRESH_KEY = 'admin_refresh_token';
-      const USER_KEY = 'admin_user';
+      const elements = {
+        mainAuth: document.getElementById('main-auth'),
+        loginForm: document.getElementById('login-form'),
+        statusMsg: document.getElementById('status-msg'),
+        heroImg: document.getElementById('hero-img')
+      };
+
+      function showLoginForm() {
+        elements.mainAuth.style.display = 'none';
+        elements.loginForm.style.display = 'flex';
+        elements.statusMsg.innerText = '';
+      }
+
+      function showMainAuth() {
+        elements.mainAuth.style.display = 'block';
+        elements.loginForm.style.display = 'none';
+        elements.statusMsg.innerText = '';
+      }
+
+      function setStatus(msg, isError = false) {
+        elements.statusMsg.innerText = msg;
+        elements.statusMsg.className = isError ? 'error' : 'success';
+      }
+
+      // Logic from original index.html
+      const ADMIN_ACCESS_KEY = 'admin_access_token';
+      const ADMIN_REFRESH_KEY = 'admin_refresh_token';
+      const ADMIN_USER_KEY = 'admin_user';
+      const DRIVER_ACCESS_KEY = 'driver_access_token';
+      const DRIVER_REFRESH_KEY = 'driver_refresh_token';
+      const DRIVER_USER_KEY = 'driver_user';
+      const DRIVER_PROFILE_COMPLETED_KEY = 'driver_profile_completed';
+      const SENDER_ACCESS_KEY = 'sender_access_token';
+      const SENDER_REFRESH_KEY = 'sender_refresh_token';
+      const SENDER_USER_KEY = 'sender_user';
       const LOGGED_OUT_KEY = 'logistika_logged_out';
+
+      function absUrl(path) {
+        return path.startsWith('/') ? path : `/${path}`;
+      }
 
       function normalizeRole(role) {
         return String(role || '').trim().toLowerCase();
       }
 
-      function redirectByRole(user) {
-        const role = normalizeRole(user?.role);
-        if (role === 'admin') {
-          window.location.replace('/admin/');
-          return;
+      function getCurrentTelegramUserId() {
+        const direct = tg?.initDataUnsafe?.user?.id;
+        if (direct) return String(direct);
+        const initData = tg?.initData;
+        if (!initData) return null;
+        try {
+          const params = new URLSearchParams(initData);
+          const userRaw = params.get('user');
+          if (!userRaw) return null;
+          const parsed = JSON.parse(userRaw);
+          return parsed?.id ? String(parsed.id) : null;
+        } catch (_) {
+          return null;
         }
-        window.location.replace('/drivers/');
       }
 
-      function saveSession(payload, user) {
-        localStorage.setItem(ACCESS_KEY, payload.access_token);
-        localStorage.setItem(REFRESH_KEY, payload.refresh_token);
-        localStorage.setItem(USER_KEY, JSON.stringify(user));
+      function getStoredUserId(role) {
+        const userKey = role === 'admin' ? ADMIN_USER_KEY : role === 'sender' ? SENDER_USER_KEY : DRIVER_USER_KEY;
+        try {
+          const raw = localStorage.getItem(userKey);
+          if (!raw) return null;
+          const parsed = JSON.parse(raw);
+          return parsed?.id ? String(parsed.id) : parsed?.user_id ? String(parsed.user_id) : null;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function canUseStoredSession(role) {
+        const currentTelegramId = getCurrentTelegramUserId();
+        if (!currentTelegramId) return true;
+        const storedUserId = getStoredUserId(role);
+        if (!storedUserId) return true;
+        return currentTelegramId === storedUserId;
+      }
+
+      function clearSessions() {
+        [ADMIN_ACCESS_KEY, ADMIN_REFRESH_KEY, ADMIN_USER_KEY, 
+         DRIVER_ACCESS_KEY, DRIVER_REFRESH_KEY, DRIVER_USER_KEY, DRIVER_PROFILE_COMPLETED_KEY,
+         SENDER_ACCESS_KEY, SENDER_REFRESH_KEY, SENDER_USER_KEY].forEach(k => localStorage.removeItem(k));
+      }
+
+      function redirectByRole(user, options = {}) {
+        const role = normalizeRole(options.role || user?.role);
+        if (role === 'admin') { window.location.replace('/admin/'); return; }
+        if (role === 'sender') { window.location.replace('/sender/'); return; }
+        if (role === 'driver') {
+          if (options.needProfile) { window.location.replace('/drivers/profile'); return; }
+          window.location.replace('/drivers/dashboard'); return;
+        }
+        // No auto-redirect if role is unknown or not set
+        console.log('User role not recognized:', role);
       }
 
       async function requestJson(url, options = {}) {
         const res = await fetch(url, options);
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.detail || data.message || 'Request failed');
+        if (!res.ok) throw new Error(data.detail || data.message || 'Xatolik yuz berdi');
         return data;
       }
 
-      async function loginWithTelegram() {
-        if (!tg?.initData) return null;
-        return requestJson('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ init_data: tg.initData }),
-        });
+      async function syncDriverProfileFlag(token) {
+        try {
+          await requestJson(absUrl('/drivers/me'), { headers: { Authorization: `Bearer ${token}` } });
+          localStorage.setItem(DRIVER_PROFILE_COMPLETED_KEY, '1');
+          return true;
+        } catch (_) {
+          localStorage.setItem(DRIVER_PROFILE_COMPLETED_KEY, '0');
+          return false;
+        }
       }
 
-      async function getMe(token) {
-        return requestJson('/api/auth/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      async function saveSession(payload, user) {
+        clearSessions();
+        const role = normalizeRole(payload.role || user?.role);
+        if (role === 'admin') {
+          localStorage.setItem(ADMIN_ACCESS_KEY, payload.access_token);
+          localStorage.setItem(ADMIN_REFRESH_KEY, payload.refresh_token || '');
+          localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(user));
+          return { role };
+        } else if (role === 'driver') {
+          localStorage.setItem(DRIVER_ACCESS_KEY, payload.access_token);
+          localStorage.setItem(DRIVER_REFRESH_KEY, payload.refresh_token || '');
+          localStorage.setItem(DRIVER_USER_KEY, JSON.stringify({ ...user, ...payload }));
+          const needProfile = payload?.status === 'need_driver_profile';
+          if (needProfile) {
+            localStorage.setItem(DRIVER_PROFILE_COMPLETED_KEY, '0');
+            return { role, needProfile: true };
+          }
+          const profileDone = await syncDriverProfileFlag(payload.access_token);
+          return { role, needProfile: !profileDone };
+        } else if (role === 'sender') {
+          localStorage.setItem(SENDER_ACCESS_KEY, payload.access_token);
+          localStorage.setItem(SENDER_REFRESH_KEY, payload.refresh_token || '');
+          localStorage.setItem(SENDER_USER_KEY, JSON.stringify({ ...user, ...payload }));
+          return { role };
+        }
+        throw new Error('Noma\'lum rol');
+      }
+
+      async function handleTelegramLogin() {
+        setStatus('Telegram orqali kirilmoqda...');
+        try {
+          if (!tg?.initData) {
+            setStatus('Telegram muhiti aniqlanmadi', true);
+            return;
+          }
+          const payload = await requestJson(absUrl('/auth/telegram-webapp-login'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ init_data: tg.initData }),
+          });
+          if (payload?.access_token) {
+            const user = await requestJson(absUrl('/auth/me'), { headers: { Authorization: `Bearer ${payload.access_token}` } });
+            const state = await saveSession(payload, user);
+            redirectByRole(user, state);
+          }
+        } catch (e) {
+          setStatus(e.message, true);
+        }
+      }
+
+      async function handlePasswordLogin() {
+        const phone = document.getElementById('phone').value;
+        const password = document.getElementById('password').value;
+        if (!phone || !password) {
+            setStatus('Iltimos, barcha maydonlarni to\'ldiring', true);
+            return;
+        }
+        setStatus('Kirilmoqda...');
+        try {
+            const payload = await requestJson(absUrl('/auth/login'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: phone, password: password })
+            });
+            if (payload?.access_token) {
+                const user = await requestJson(absUrl('/auth/me'), { headers: { Authorization: `Bearer ${payload.access_token}` } });
+                const state = await saveSession(payload, user);
+                redirectByRole(user, state);
+            }
+        } catch (e) {
+            setStatus(e.message, true);
+        }
       }
 
       async function boot() {
-        const loggedOut = localStorage.getItem(LOGGED_OUT_KEY) === '1';
-        if (loggedOut) {
-          window.location.replace('/drivers/');
-          return;
+        // Auto-login logic if session exists
+        const tokens = [
+            { key: ADMIN_ACCESS_KEY, role: 'admin' },
+            { key: DRIVER_ACCESS_KEY, role: 'driver' },
+            { key: SENDER_ACCESS_KEY, role: 'sender' }
+        ];
+
+        for (const t of tokens) {
+            const token = localStorage.getItem(t.key);
+            if (token && canUseStoredSession(t.role)) {
+                try {
+                    const user = await requestJson(absUrl('/auth/me'), { headers: { Authorization: `Bearer ${token}` } });
+                    const state = await saveSession({ access_token: token, role: t.role }, user);
+                    redirectByRole(user, state);
+                    return;
+                } catch (_) {
+                    localStorage.removeItem(t.key);
+                }
+            }
         }
-
-        const token = localStorage.getItem(ACCESS_KEY);
-        const cachedUser = localStorage.getItem(USER_KEY);
-        if (token && cachedUser) {
-          try {
-            redirectByRole(JSON.parse(cachedUser));
-            return;
-          } catch {
-            localStorage.removeItem(USER_KEY);
-          }
+        
+        // If in Telegram and no session, try auto-login via Telegram
+        if (tg?.initData) {
+            try {
+                const payload = await requestJson(absUrl('/auth/telegram-webapp-login'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ init_data: tg.initData }),
+                });
+                if (payload?.access_token) {
+                    const user = await requestJson(absUrl('/auth/me'), { headers: { Authorization: `Bearer ${payload.access_token}` } });
+                    const state = await saveSession(payload, user);
+                    redirectByRole(user, state);
+                }
+            } catch (_) {}
         }
-
-        try {
-          const payload = await loginWithTelegram();
-          if (payload?.access_token) {
-            const user = await getMe(payload.access_token);
-            saveSession(payload, user);
-            redirectByRole(user);
-            return;
-          }
-        } catch (_) {}
-
-        window.location.replace('/drivers/');
       }
 
       boot();
     </script>
-  </body>
+</body>
 </html>

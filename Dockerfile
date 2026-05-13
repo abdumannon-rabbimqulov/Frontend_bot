@@ -20,6 +20,7 @@ FROM nginx:1.27-alpine
 WORKDIR /usr/share/nginx/html
 
 COPY index.html /usr/share/nginx/html/index.html
+COPY sender /usr/share/nginx/html/sender
 COPY --from=admin-build /build/admin/dist /usr/share/nginx/html/admin
 COPY --from=driver-build /build/driver/dist /usr/share/nginx/html/drivers/dist
 COPY nginx.docker.conf /etc/nginx/conf.d/default.conf

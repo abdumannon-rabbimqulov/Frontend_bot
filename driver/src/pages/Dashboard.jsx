@@ -1,17 +1,36 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Truck, MapPin, MessageCircle, Award } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import DriverLayout from '../components/DriverLayout';
-
-const chartData = [
-  { day: 'Du', km: 120 }, { day: 'Se', km: 80 }, { day: 'Ch', km: 200 },
-  { day: 'Pa', km: 150 }, { day: 'Ju', km: 320 }, { day: 'Sh', km: 90 }, { day: 'Ya', km: 180 },
-];
+import { ai, announcements, driverProfile, loads } from '../lib/api';
 
 export default function Dashboard() {
   const nav = useNavigate();
-  const [liveOn, setLiveOn] = useState(true);
+  const qc = useQueryClient();
+  const { data: loadItems = [] } = useQuery({
+    queryKey: ['dashboardLoads'],
+    queryFn: () => loads.list(),
+  });
+  const { data: me } = useQuery({
+    queryKey: ['driverMe'],
+    queryFn: driverProfile.me,
+  });
+  const { data: myAnnouncements = [] } = useQuery({
+    queryKey: ['myAnnouncements', me?.id],
+    queryFn: () => announcements.list({ driver_id: me?.id }),
+    enabled: !!me?.id,
+  });
+  const { data: usage } = useQuery({
+    queryKey: ['aiUsage'],
+    queryFn: ai.usage,
+  });
+  const liveOn = me?.is_available ?? false;
+  const availabilityMutation = useMutation({
+    mutationFn: (value) => driverProfile.update({ is_available: value }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['driverMe'] }),
+  });
+  const loadsCount = Array.isArray(loadItems) ? loadItems.length : 0;
 
   return (
     <DriverLayout>
@@ -33,7 +52,8 @@ export default function Dashboard() {
             {liveOn ? 'LIVE' : 'OFF'}
           </div>
           <button
-            onClick={() => setLiveOn(!liveOn)}
+            onClick={() => availabilityMutation.mutate(!liveOn)}
+            disabled={availabilityMutation.isPending}
             className="rounded-full border border-white/20 px-3 py-1 text-xs active:scale-95"
           >
             {liveOn ? 'O‘chirish' : 'Yoqish'}
@@ -45,14 +65,14 @@ export default function Dashboard() {
       <div className="mx-4 mt-2 rounded-3xl bg-gradient-to-br from-primary/20 to-indigo-500/10 p-5 border border-primary/30">
         <div className="flex justify-between">
           <div>
-            <div className="text-sm text-muted">Bugungi mos yuklar</div>
-            <div className="text-6xl font-bold tracking-tighter">12</div>
+            <div className="text-sm text-muted">Mavjud yuklar</div>
+            <div className="text-6xl font-bold tracking-tighter">{loadsCount}</div>
           </div>
           <div className="text-right">
             <div className="inline-block rounded-2xl bg-white/10 p-3">
               <Truck size={42} className="text-primary" />
             </div>
-            <div className="mt-1 text-xs text-muted">Boshqa 8 ta yuk</div>
+            <div className="mt-1 text-xs text-muted">Yangilanib turadi</div>
           </div>
         </div>
       </div>
@@ -64,16 +84,16 @@ export default function Dashboard() {
             <div className="rounded-2xl bg-primary/10 p-2"><MapPin className="text-primary" /></div>
             <div>
               <div className="font-semibold">Yuk qidirish</div>
-              <div className="text-xs text-muted">12 ta mos yuk</div>
+              <div className="text-xs text-muted">{loadsCount} ta yuk</div>
             </div>
           </div>
         </button>
-        <button onClick={() => alert('Bo\'sh joy e\'loni yaratish (keyingi versiyada)')} className="panel p-4 text-left active:scale-[0.985]">
+        <button onClick={() => nav('/profile')} className="panel p-4 text-left active:scale-[0.985]">
           <div className="flex items-center gap-3">
             <div className="rounded-2xl bg-warning/10 p-2"><Award className="text-warning" /></div>
             <div>
-              <div className="font-semibold">Bo'sh joy e'loni</div>
-              <div className="text-xs text-muted">Yukingizni e'lon qiling</div>
+              <div className="font-semibold">Profil</div>
+              <div className="text-xs text-muted">Ma'lumotlarni yangilang</div>
             </div>
           </div>
         </button>
@@ -82,7 +102,7 @@ export default function Dashboard() {
             <div className="rounded-2xl bg-success/10 p-2"><Truck className="text-success" /></div>
             <div>
               <div className="font-semibold">Aktiv reys</div>
-              <div className="text-xs text-muted">Toshkent → Buxoro</div>
+              <div className="text-xs text-muted">Haqiqiy holat backenddan olinadi</div>
             </div>
           </div>
         </button>
@@ -100,34 +120,25 @@ export default function Dashboard() {
       {/* Stats */}
       <div className="mx-4 mt-6">
         <div className="mb-2 flex items-center justify-between px-1">
-          <div className="font-semibold">Daraomd statistikasi</div>
-          <div className="text-xs text-muted">Bugun • 2 ta reys</div>
+          <div className="font-semibold">Statistika</div>
+          <div className="text-xs text-muted">API orqali real holat</div>
         </div>
         <div className="panel p-4">
-          <div className="text-3xl font-bold">3 240 000 <span className="text-base font-normal text-muted">so‘m</span></div>
-          <div className="text-xs text-success">+320 km • +18%</div>
-          <div className="mt-4 h-28">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorKm" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#38bdf8" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="day" tick={{fontSize:10, fill:'#64748b'}} />
-                <YAxis hide />
-                <Tooltip contentStyle={{background:'#0f172a', border:'none', borderRadius:8}} />
-                <Area type="natural" dataKey="km" stroke="#38bdf8" fill="url(#colorKm)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <div className="text-muted text-xs">Mening e'lonlarim</div>
+              <div className="font-semibold">{myAnnouncements.length}</div>
+            </div>
+            <div>
+              <div className="text-muted text-xs">AI so'rovlar (bugun)</div>
+              <div className="font-semibold">{usage?.requests ?? usage?.total_requests ?? 0}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Recent Activity hint */}
       <div className="mx-4 mt-4 text-center text-xs text-muted pb-4">
-        Eng so‘nggi: Andijon → Navoiy • 150 km • 5.2 mln so‘m
+        Faqat real ma'lumotlar ko‘rsatiladi
       </div>
     </DriverLayout>
   );
