@@ -64,10 +64,7 @@ else
     rsync -az --delete \
         -e "ssh -i '$SSH_KEY' -o StrictHostKeyChecking=no -o ControlMaster=auto -o ControlPersist=60s -o ControlPath=/tmp/logistika_frontend_%r@%h:%p" \
         --exclude '.git' \
-        --exclude 'admin/node_modules' \
-        --exclude 'admin/dist' \
-        --exclude 'driver/node_modules' \
-        --exclude 'driver/dist' \
+        --exclude '.next' \
         --exclude 'node_modules' \
         --exclude '.cursor' \
         --exclude '.DS_Store' \
@@ -81,4 +78,3 @@ fi
 
 echo "✅ Frontend deploy successfully completed!"
 echo "   Frontend: https://logistic.org.uz/"
-echo "   Driver WEBAPP_URL: https://logistic.org.uz/drivers/"

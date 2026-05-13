@@ -1,28 +1,25 @@
-FROM node:20-alpine AS admin-build
-WORKDIR /build/admin
-
-COPY admin/package*.json ./
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
 RUN npm ci --no-audit --no-fund
 
-COPY admin/ ./
+FROM node:20-alpine AS builder
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 RUN npm run build
 
-FROM node:20-alpine AS driver-build
-WORKDIR /build/driver
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
 
-COPY driver/package*.json ./
-RUN npm ci --no-audit --no-fund
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/next.config.ts ./next.config.ts
 
-COPY driver/ ./
-RUN npm run build
-
-FROM nginx:1.27-alpine
-WORKDIR /usr/share/nginx/html
-
-COPY index.html /usr/share/nginx/html/index.html
-COPY sender /usr/share/nginx/html/sender
-COPY --from=admin-build /build/admin/dist /usr/share/nginx/html/admin
-COPY --from=driver-build /build/driver/dist /usr/share/nginx/html/drivers/dist
-COPY nginx.docker.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
+EXPOSE 3000
+CMD ["npm", "run", "start"]

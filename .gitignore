@@ -23,3 +23,5 @@ admin/dist/
 # Driver SPA local/build artifacts
 driver/node_modules/
 driver/dist/
+node_modules
+.next/

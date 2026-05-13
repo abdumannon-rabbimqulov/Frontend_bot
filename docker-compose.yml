@@ -5,7 +5,11 @@ services:
       dockerfile: Dockerfile
     container_name: logistika_frontend
     ports:
-      - "127.0.0.1:8088:80"
+      - "127.0.0.1:8088:3000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://logistic.org.uz
+      - NEXT_PUBLIC_WS_URL=wss://logistic.org.uz
     restart: always
