@@ -16,12 +16,10 @@
 # Deployment artifacts
 *.tar.gz
 
-# Admin SPA local/build artifacts
+# Dependencies & build
+node_modules/
+.next/
 admin/node_modules/
 admin/dist/
-
-# Driver SPA local/build artifacts
 driver/node_modules/
 driver/dist/
-node_modules
-.next/

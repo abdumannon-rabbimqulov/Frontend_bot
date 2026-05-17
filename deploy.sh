@@ -11,18 +11,19 @@ NGINX_TARGET="/etc/nginx/conf.d/logistic.org.uz.conf"
 deploy_here() {
     local project_dir="${1:-$(pwd)}"
 
-    if [ ! -f "$project_dir/docker-compose.yml" ]; then
-        echo "docker-compose.yml topilmadi: $project_dir/docker-compose.yml" >&2
-        exit 1
-    fi
     if [ ! -f "$project_dir/$NGINX_FRAGMENT" ]; then
         echo "Nginx config topilmadi: $project_dir/$NGINX_FRAGMENT" >&2
         exit 1
     fi
 
-    echo "🐳 Building and restarting frontend Docker container..."
     cd "$project_dir"
-    docker compose up -d --build frontend
+
+    if [ -f "$project_dir/Dockerfile" ] && grep -q '^[[:space:]]*frontend:' "$project_dir/docker-compose.yml" 2>/dev/null; then
+        echo "🐳 Building and restarting frontend Docker container..."
+        docker compose up -d --build frontend
+    else
+        echo "ℹ️  Frontend Docker o‘chirilgan — faqat Nginx yangilanadi."
+    fi
 
     echo "⚙️  Applying public Nginx config..."
     if [ "$(id -u)" -eq 0 ]; then

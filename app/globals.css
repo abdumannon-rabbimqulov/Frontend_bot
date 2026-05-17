@@ -3,13 +3,29 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  --bg-deep: #020812;
+  --neon-cyan: #00d4ff;
+  --neon-purple: #6366f1;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  @apply bg-[#020617] text-white antialiased;
+  background: var(--bg-deep);
+  color: #fff;
+  min-height: 100vh;
 }
 
-.glass {
-  @apply border border-white/10 bg-white/5 backdrop-blur-xl;
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+  }
+
+  .border-glow {
+    box-shadow:
+      0 0 0 1px rgba(0, 212, 255, 0.4),
+      0 0 20px rgba(0, 212, 255, 0.2);
+  }
 }
