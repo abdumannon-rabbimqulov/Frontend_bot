@@ -12,8 +12,9 @@ import Link from "next/link";
 import { HeroBackground } from "@/components/home/hero-background";
 import { UzbekistanMap } from "@/components/home/uzbekistan-map";
 
-const TELEGRAM_USERNAME = "Abdumannonrab";
-const TELEGRAM_URL = `https://t.me/${TELEGRAM_USERNAME}`;
+const TELEGRAM_BOT_URL = "https://t.me/Logistika_AIbot/logistika";
+const DEVELOPER_TELEGRAM_USERNAME = "Abdumannonrab";
+const DEVELOPER_TELEGRAM_URL = `https://t.me/${DEVELOPER_TELEGRAM_USERNAME}`;
 
 const AI_ICONS = [
   { Icon: Cpu, label: "AI chip" },
@@ -61,7 +62,7 @@ export default function HomePage() {
 
           <div className="flex items-center gap-3 sm:gap-4">
             <a
-              href={TELEGRAM_URL}
+              href={TELEGRAM_BOT_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-full border border-[#00d4ff]/50 bg-[#0a1628]/80 px-3 py-2 text-xs text-white shadow-[0_0_16px_rgba(0,212,255,0.2)] transition-all duration-300 hover:scale-[1.03] hover:border-[#00d4ff] hover:shadow-[0_0_24px_rgba(0,212,255,0.4)] sm:px-4 sm:text-sm"
@@ -181,12 +182,12 @@ export default function HomePage() {
                   <li className="flex items-center gap-3 text-sm text-slate-300">
                     <Send className="h-5 w-5 shrink-0 text-[#00d4ff]" />
                     <a
-                      href={TELEGRAM_URL}
+                      href={DEVELOPER_TELEGRAM_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:text-[#00d4ff]"
                     >
-                      @{TELEGRAM_USERNAME}
+                      @{DEVELOPER_TELEGRAM_USERNAME}
                     </a>
                   </li>
                   <li className="flex items-center gap-3 text-sm text-slate-300">
